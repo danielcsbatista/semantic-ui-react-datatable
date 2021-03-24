@@ -14,5 +14,14 @@ export default {
     },
   ],
   plugins: [sass({ insert: true }), typescript()],
-  external: ["react", "react-dom"],
+  external: [
+    "react",
+    "react-dom",
+    "typescript",
+    "semantic-ui-react",
+    "loadash",
+    "semantic-ui-css",
+    "date-fns",
+    "loadash",
+  ],
 };

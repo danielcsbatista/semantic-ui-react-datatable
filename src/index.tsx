@@ -1,7 +1,8 @@
-import React, { useState, useEffect, memo } from 'react';
-import { IDataTableProps, IEntities } from './interfaces';
-import { isEqual } from 'lodash';
-import './style.scss';
+import React, { useState, memo, useEffect } from "react";
+import { IDataTableProps, IEntities } from "./interfaces";
+import "semantic-ui-css/semantic.min.css";
+import { isEqual } from "lodash";
+import "./style.scss";
 
 import {
   Table,
@@ -9,15 +10,15 @@ import {
   Icon,
   Segment,
   Grid,
-  Pagination
-} from 'semantic-ui-react';
-import LoadingML from '../Loader';
-import Rows from './helpers/rows';
-import Error from './helpers/error';
-import HeaderTable from './helpers/headerTable';
-import ExtractJSONValues from './helpers/extractJSONValues';
+  Pagination,
+  Loader,
+} from "semantic-ui-react";
+import Rows from "./helpers/rows";
+import Error from "./helpers/error";
+import HeaderTable from "./helpers/headerTable";
+import ExtractJSONValues from "./helpers/extractJSONValues";
 
-function MlDataTable(props: IDataTableProps) {
+const DataTable = (props: IDataTableProps) => {
   const [entities, setEntities] = useState<IEntities>({
     items: [],
     pageIndex: 1,
@@ -25,14 +26,14 @@ function MlDataTable(props: IDataTableProps) {
     totalCount: -1,
     totalPages: -1,
     hasPrevious: false,
-    hasNext: false
+    hasNext: false,
   });
   const [sortedColumn, setSortedColumn] = useState<string>(
-    props.sortedColumn || props.columnHeader[0].key
+    props.sortedColumn || props.columnHeader[0].key,
   );
-  const [order, setOrder] = useState<string>(props.order || 'desc');
+  const [order, setOrder] = useState<string>(props.order || "desc");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [totalPerPage] = useState<number>(props.itemsPerPage || 25);
 
@@ -46,10 +47,10 @@ function MlDataTable(props: IDataTableProps) {
 
     if (
       data === undefined &&
-      errorMessage !== '' &&
+      errorMessage !== "" &&
       errorMessage !== undefined
     ) {
-      if (error === '') setError(errorMessage);
+      if (error === "") setError(errorMessage);
     }
 
     const validation = data
@@ -59,39 +60,39 @@ function MlDataTable(props: IDataTableProps) {
     if (validation) {
       setEntities(data);
       setLoading(false);
-      setError('');
+      setError("");
     }
   }, [error, props.data, entities.items]);
 
   const fetchEntities = (
     numberPage: number,
     orderPage: string = order,
-    column: string = sortedColumn
+    column: string = sortedColumn,
   ) => {
     setLoading(true);
     props.fetchFunction({
       totalPerPage,
       currentPage: numberPage || 1,
       sortedColumn: column,
-      order: orderPage
+      order: orderPage,
     });
   };
 
   const changePage = (
-    event: React.MouseEvent<HTMLAnchorElement, MouseEvent> | undefined,
-    data: any
+    _event: React.MouseEvent<HTMLAnchorElement, MouseEvent> | undefined,
+    data: any,
   ) => {
     setCurrentPage(data.activePage);
     fetchEntities(data.activePage);
   };
 
   function sortByColumn(column: string) {
-    let newOrder = '';
+    let newOrder = "";
     if (column === sortedColumn) {
-      newOrder = order === 'asc' ? 'desc' : 'asc';
+      newOrder = order === "asc" ? "desc" : "asc";
       fetchEntities(1, newOrder, sortedColumn);
     } else {
-      newOrder = 'asc';
+      newOrder = "asc";
       setSortedColumn(column);
       fetchEntities(1, newOrder, column);
     }
@@ -119,10 +120,10 @@ function MlDataTable(props: IDataTableProps) {
     <Segment
       basic
       style={{
-        padding: '0px'
+        padding: "0px",
       }}
     >
-      {loading && <LoadingML />}
+      {loading && <Loader />}
       <Grid>
         <Grid.Column>
           {search && (
@@ -158,21 +159,21 @@ function MlDataTable(props: IDataTableProps) {
       </Grid>
     </Segment>
   );
-}
+};
 
 export function areEqual(
   prevProps: IDataTableProps,
-  nextProps: IDataTableProps
+  nextProps: IDataTableProps,
 ) {
   const prev = {
     items: prevProps.data?.data?.items,
-    externalLoader: prevProps.externalLoader
+    externalLoader: prevProps.externalLoader,
   };
   const next = {
     items: nextProps.data?.data?.items,
-    externalLoader: nextProps.externalLoader
+    externalLoader: nextProps.externalLoader,
   };
   return isEqual(prev, next);
 }
 
-export default memo(MlDataTable, areEqual);
+export default memo(DataTable, areEqual);
